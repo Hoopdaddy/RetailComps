@@ -1,4 +1,4 @@
-# Tractor Supply Cart and Checkout PM Workbench
+# Hoop's Cart and Checkout PM Workbench
 
 A local-first competitive monitoring workspace for a Tractor Supply product manager tracking retailer cart and checkout experiences.
 
