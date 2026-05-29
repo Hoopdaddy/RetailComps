@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "start": "node server.js 4174"
+  },
+  "private": true
+}
