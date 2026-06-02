@@ -64,7 +64,9 @@ function renderMatrix() {
   $$("[data-cell]").forEach((button) => button.onclick = () => {
     const [retailerId, featureId] = button.dataset.cell.split(":");
     const current = state.matrix[retailerId][featureId] || "unknown";
-    state.matrix[retailerId][featureId] = statusOrder[(statusOrder.indexOf(current) + 1) % statusOrder.length];
+    const next = statusOrder[(statusOrder.indexOf(current) + 1) % statusOrder.length];
+    state.matrix[retailerId][featureId] = next;
+    recordFeatureObservation(retailerId, featureId, next);
     write(storage.matrix, state.matrix);
     renderMatrix();
     toast("Feature matrix saved.");
@@ -77,7 +79,9 @@ function diffRows(rows) {
 
 function renderReports() {
   const rows = differences();
-  shell("Period comparison report", `<div class="report-grid"><section class="panel"><div class="panel-header"><div><h3>Report controls</h3><p>Period selectors feed every comparison view.</p></div></div><div class="panel-body"><div class="period-controls"><label class="field">From period<select id="reportFrom">${optionList(state.from)}</select></label><label class="field">To period<select id="reportTo">${optionList(state.to)}</select></label></div><div class="diff-note">${badge(`${rows.length} rows`, "info")}<p><strong>Coverage:</strong> ${esc(state.from)} compared with ${esc(state.to)} across saved cart and checkout screenshots.</p></div></div></section><section class="panel"><div class="panel-header"><div><h3>Period differences</h3><p>Missing, new, and changed screenshots by retailer.</p></div></div><div>${diffRows(rows)}</div></section></div><div style="margin-top:18px"><section class="panel"><div class="panel-header"><div><h3>Opportunity queue</h3><p>Feature matrix gaps to consider for TSC.</p></div></div><div>${opportunities().map((item) => `<article class="opportunity-row"><div><strong>${esc(item.feature.label)}</strong><p>Seen at ${esc(item.examples.join(", "))}; TSC is ${labels[item.tsc].toLowerCase()}.</p></div>${badge(`${item.examples.length} retailers`, "warn")}</article>`).join("")}</div></section></div>`);
+  const selectedFeature = featureById(state.featureId);
+  const featureRows = featureReportRows();
+  shell("Period and feature reports", `<div class="report-grid"><section class="panel"><div class="panel-header"><div><h3>Report controls</h3><p>Period and feature selectors feed the reports below.</p></div></div><div class="panel-body"><div class="period-controls"><label class="field">From period<select id="reportFrom">${optionList(state.from)}</select></label><label class="field">To period<select id="reportTo">${optionList(state.to)}</select></label><label class="field">Feature<select id="featureSelect">${features.map((feature) => `<option value="${feature.id}" ${feature.id === state.featureId ? "selected" : ""}>${esc(feature.group)} - ${esc(feature.label)}</option>`).join("")}</select></label><label class="field">Include<select id="featureStatusSelect"><option value="yes" ${state.featureStatus === "yes" ? "selected" : ""}>Yes only</option><option value="yes-partial" ${state.featureStatus === "yes-partial" ? "selected" : ""}>Yes and Partial</option></select></label></div><div class="diff-note">${badge(`${featureRows.length} retailers`, "info")}<p><strong>${esc(selectedFeature.label)}:</strong> retailers currently marked ${state.featureStatus === "yes" ? "Yes" : "Yes or Partial"} in the feature matrix, with the first date we noticed the feature.</p></div></div></section><section class="panel"><div class="panel-header"><div><h3>Feature availability report</h3><p>${esc(selectedFeature.group)} feature tracked from the matrix.</p></div></div><div>${featureRows.length ? featureRows.map((row) => `<article class="capture-row"><div><strong>${esc(row.retailer.name)}</strong><span>First noticed ${fmt(row.firstSeen)}. Last confirmed ${fmt(row.lastSeen)}. ${esc(row.source)}.</span></div>${badge(labels[row.status], statusTone(row.status))}<a class="link-action" href="${esc(row.retailer.url)}" target="_blank" rel="noreferrer">Open site</a></article>`).join("") : `<p class="empty-state">No retailers currently match this feature filter.</p>`}</div></section></div><div style="margin-top:18px"><section class="panel"><div class="panel-header"><div><h3>Period differences</h3><p>Missing, new, and changed screenshots by retailer.</p></div></div><div>${diffRows(rows)}</div></section></div><div style="margin-top:18px"><section class="panel"><div class="panel-header"><div><h3>Opportunity queue</h3><p>Feature matrix gaps to consider for TSC.</p></div></div><div>${opportunities().map((item) => `<article class="opportunity-row"><div><strong>${esc(item.feature.label)}</strong><p>Seen at ${esc(item.examples.join(", "))}; TSC is ${labels[item.tsc].toLowerCase()}.</p></div>${badge(`${item.examples.length} retailers`, "warn")}</article>`).join("")}</div></section></div>`);
   $("#reportFrom").onchange = (event) => {
     state.from = event.target.value;
     savePrefs();
@@ -85,6 +89,16 @@ function renderReports() {
   };
   $("#reportTo").onchange = (event) => {
     state.to = event.target.value;
+    savePrefs();
+    renderReports();
+  };
+  $("#featureSelect").onchange = (event) => {
+    state.featureId = event.target.value;
+    savePrefs();
+    renderReports();
+  };
+  $("#featureStatusSelect").onchange = (event) => {
+    state.featureStatus = event.target.value;
     savePrefs();
     renderReports();
   };
