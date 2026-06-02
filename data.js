@@ -34,7 +34,8 @@ const statusOrder = ["yes", "partial", "no", "unknown"];
 const storage = {
   matrix: "tsc-pm-matrix-v2",
   captures: "tsc-pm-captures-v2",
-  prefs: "tsc-pm-prefs-v2"
+  prefs: "tsc-pm-prefs-v2",
+  observations: "tsc-pm-feature-observations-v1"
 };
 
 const seedMatrix = {
@@ -58,7 +59,10 @@ let state = {
   uploadPeriod: "May 2026 W5",
   matrixFilter: "all",
   matrixSearch: "",
+  featureId: "cartFulfillment",
+  featureStatus: "yes",
   matrix: loadMatrix(),
+  observations: loadFeatureObservations(),
   captures: []
 };
 
@@ -101,8 +105,92 @@ function savePrefs() {
     device: state.device,
     from: state.from,
     to: state.to,
-    uploadPeriod: state.uploadPeriod
+    uploadPeriod: state.uploadPeriod,
+    featureId: state.featureId,
+    featureStatus: state.featureStatus
   });
+}
+
+function featureById(featureId) {
+  return features.find((feature) => feature.id === featureId) || features[0];
+}
+
+function seedFeatureDate(retailerId, featureId) {
+  const feature = featureById(featureId);
+  if (retailerId === "chewy" && feature.group === "Cart") return "2026-05-28T12:32:56.678Z";
+  if (retailerId === "chewy") return "2026-05-27T22:05:58.150Z";
+  if (retailerId === "lowes" && feature.group === "Cart") return "2026-05-27T19:24:27.413Z";
+  if (retailerId === "lowes") return "2026-05-27T21:57:13.274Z";
+  if (retailerId === "tractor-supply") return "2026-05-28T14:00:00.000Z";
+  return feature.group === "Cart" ? "2026-05-28T16:00:00.000Z" : "2026-05-28T17:00:00.000Z";
+}
+
+function loadFeatureObservations() {
+  const observations = {};
+  for (const item of retailers) {
+    observations[item.id] = {};
+    features.forEach((feature, index) => {
+      const status = seedMatrix[item.id]?.[index] || "unknown";
+      if (status === "yes" || status === "partial") {
+        const noticedAt = seedFeatureDate(item.id, feature.id);
+        observations[item.id][feature.id] = {
+          firstSeen: noticedAt,
+          lastSeen: noticedAt,
+          source: "Seeded matrix review"
+        };
+      }
+    });
+  }
+
+  const saved = read(storage.observations, {});
+  for (const retailerId of Object.keys(saved)) {
+    observations[retailerId] = { ...(observations[retailerId] || {}), ...saved[retailerId] };
+  }
+  return observations;
+}
+
+function saveObservations() {
+  write(storage.observations, state.observations);
+}
+
+function recordFeatureObservation(retailerId, featureId, status, at = new Date().toISOString()) {
+  if (status !== "yes" && status !== "partial") return;
+  if (!state.observations[retailerId]) state.observations[retailerId] = {};
+  const previous = state.observations[retailerId][featureId];
+  state.observations[retailerId][featureId] = {
+    firstSeen: previous?.firstSeen || at,
+    lastSeen: at,
+    source: "Manual matrix update"
+  };
+  saveObservations();
+}
+
+function statusTone(status) {
+  if (status === "yes") return "good";
+  if (status === "partial") return "warn";
+  if (status === "no") return "bad";
+  return "info";
+}
+
+function featureReportRows() {
+  const allowedStatuses = state.featureStatus === "yes" ? ["yes"] : ["yes", "partial"];
+  return retailers
+    .map((item) => {
+      const status = state.matrix[item.id]?.[state.featureId] || "unknown";
+      const observation = state.observations[item.id]?.[state.featureId];
+      return {
+        retailer: item,
+        status,
+        firstSeen: observation?.firstSeen || seedFeatureDate(item.id, state.featureId),
+        lastSeen: observation?.lastSeen || observation?.firstSeen || seedFeatureDate(item.id, state.featureId),
+        source: observation?.source || "Seeded matrix review"
+      };
+    })
+    .filter((row) => allowedStatuses.includes(row.status))
+    .sort((a, b) => {
+      if (a.status !== b.status) return a.status === "yes" ? -1 : 1;
+      return new Date(a.firstSeen) - new Date(b.firstSeen);
+    });
 }
 
 function sampleShot(name, surface, color, lines) {
