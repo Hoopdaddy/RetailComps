@@ -1,3 +1,4 @@
 pm-workbench-*.png
 *.log
 node_modules/
+public/
