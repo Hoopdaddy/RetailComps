@@ -247,6 +247,12 @@ async function runSite(browser, site) {
   } catch (error) {
     result.status = "partial";
     result.observations.push(`Automation stopped early: ${cleanText(error.message)}`);
+    if (!captures.some((capture) => capture.surface === "cart")) {
+      await saveCapture(page, site, "cart", `${site.id}-cart.png`, captures, "Fallback capture from the current page after automation stopped before the cart page.");
+    }
+    if (!captures.some((capture) => capture.surface === "checkout")) {
+      await saveCapture(page, site, "checkout", `${site.id}-checkout.png`, captures, "Fallback capture from the current page after automation stopped before checkout.");
+    }
     const errorFile = `${site.id}-automation-state.png`;
     await page.screenshot({ path: path.join(runDir, errorFile), fullPage: true }).catch(() => {});
     result.files.push(errorFile);
