@@ -2,7 +2,7 @@
   "scripts": {
     "build": "node scripts/build-static.js",
     "capture:weekly": "node scripts/capture-weekly.js",
-    "start": "node server.js 4174"
+    "start": "node scripts/serve-local.js 4174"
   },
   "devDependencies": {
     "playwright": "^1.44.0"
