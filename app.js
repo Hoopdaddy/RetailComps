@@ -79,7 +79,7 @@ function toast(message) {
 }
 
 function exportData() {
-  const payload = { exportedAt: new Date().toISOString(), matrix: state.matrix, observations: state.observations, captures: state.captures.filter((capture) => !capture.seed) };
+  const payload = { exportedAt: new Date().toISOString(), matrix: state.matrix, observations: state.observations, captures: state.captures.filter((capture) => !capture.seed && !capture.automated) };
   const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
   const link = document.createElement("a");
   link.href = url;
@@ -93,7 +93,7 @@ async function importData(file) {
     const payload = JSON.parse(await file.text());
     if (payload.matrix) state.matrix = { ...state.matrix, ...payload.matrix };
     if (payload.observations) state.observations = { ...state.observations, ...payload.observations };
-    if (Array.isArray(payload.captures)) state.captures = byDate([...seedCaptures, ...payload.captures.map((capture) => ({ ...capture, seed: false }))]);
+    if (Array.isArray(payload.captures)) state.captures = byDate([...seedCaptures, ...state.captures.filter((capture) => capture.automated), ...payload.captures.map((capture) => ({ ...capture, seed: false, automated: false }))]);
     write(storage.matrix, state.matrix);
     saveObservations();
     saveCaptures();
@@ -119,3 +119,9 @@ $("#exportButton").onclick = exportData;
 $("#importButton").onclick = () => $("#importFile").click();
 $("#importFile").onchange = (event) => event.target.files[0] && importData(event.target.files[0]);
 render();
+
+if (typeof loadAutomatedCaptures === "function") {
+  loadAutomatedCaptures().then((count) => {
+    if (count) render();
+  });
+}
