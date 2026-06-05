@@ -84,8 +84,12 @@ function exportData() {
   const link = document.createElement("a");
   link.href = url;
   link.download = "tsc-cart-checkout-workbench.json";
+  link.style.display = "none";
+  document.body.appendChild(link);
   link.click();
-  URL.revokeObjectURL(url);
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+  toast("Workspace export started.");
 }
 
 async function importData(file) {
@@ -116,8 +120,10 @@ loadCaptures();
 bindViewButtons();
 $("#resetOrderButton").onclick = () => toast("Retailer order is already reset.");
 $("#exportButton").onclick = exportData;
-$("#importButton").onclick = () => $("#importFile").click();
-$("#importFile").onchange = (event) => event.target.files[0] && importData(event.target.files[0]);
+$("#importFile").onchange = (event) => {
+  if (event.target.files[0]) importData(event.target.files[0]);
+  event.target.value = "";
+};
 render();
 
 if (typeof loadAutomatedCaptures === "function") {
