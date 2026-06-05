@@ -7,6 +7,7 @@ const files = [
   "index.html",
   "styles.css",
   "data.js",
+  "automated-captures.js",
   "views.js",
   "app.js"
 ];
@@ -18,9 +19,12 @@ for (const file of files) {
   fs.copyFileSync(path.join(root, file), path.join(output, file));
 }
 
-const assets = path.join(root, "assets");
-if (fs.existsSync(assets)) {
-  fs.cpSync(assets, path.join(output, "assets"), { recursive: true });
+const directories = ["assets", "automated-captures"];
+for (const directory of directories) {
+  const source = path.join(root, directory);
+  if (fs.existsSync(source)) {
+    fs.cpSync(source, path.join(output, directory), { recursive: true });
+  }
 }
 
 console.log(`Static site copied to ${output}`);
