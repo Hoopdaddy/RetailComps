@@ -2,7 +2,7 @@
   "runs": [
     {
       "id": "2026-06-05",
-      "at": "2026-06-05T20:53:36.178Z",
+      "at": "2026-06-05T21:09:02.283Z",
       "period": "Jun 2026 W1",
       "summary": "2026-06-05/summary.md",
       "results": [
@@ -36,7 +36,7 @@
       "surface": "cart",
       "device": "desktop",
       "period": "Jun 2026 W1",
-      "at": "2026-06-05T20:53:36.178Z",
+      "at": "2026-06-05T21:09:02.283Z",
       "src": "2026-06-05/chewy-cart.png",
       "notes": "Captured automatically from the cart page after attempting two-item setup.",
       "diff": "Automated cart capture from Jun 2026 W1. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
@@ -47,7 +47,7 @@
       "surface": "checkout",
       "device": "desktop",
       "period": "Jun 2026 W1",
-      "at": "2026-06-05T20:53:36.178Z",
+      "at": "2026-06-05T21:09:02.283Z",
       "src": "2026-06-05/chewy-checkout.png",
       "notes": "Captured automatically from the first checkout or checkout-entry page.",
       "diff": "Automated checkout capture from Jun 2026 W1. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
@@ -58,7 +58,7 @@
       "surface": "cart",
       "device": "desktop",
       "period": "Jun 2026 W1",
-      "at": "2026-06-05T20:53:36.178Z",
+      "at": "2026-06-05T21:09:02.283Z",
       "src": "2026-06-05/target-cart.png",
       "notes": "Captured automatically from the cart page after attempting two-item setup.",
       "diff": "Automated cart capture from Jun 2026 W1. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
@@ -69,9 +69,31 @@
       "surface": "checkout",
       "device": "desktop",
       "period": "Jun 2026 W1",
-      "at": "2026-06-05T20:53:36.178Z",
+      "at": "2026-06-05T21:09:02.283Z",
       "src": "2026-06-05/target-checkout.png",
       "notes": "Captured automatically from the first checkout or checkout-entry page.",
+      "diff": "Automated checkout capture from Jun 2026 W1. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
+    },
+    {
+      "id": "auto-2026-06-05-tractor-supply-cart",
+      "retailerId": "tractor-supply",
+      "surface": "cart",
+      "device": "desktop",
+      "period": "Jun 2026 W1",
+      "at": "2026-06-05T21:09:02.283Z",
+      "src": "2026-06-05/tractor-supply-cart.png",
+      "notes": "Fallback capture from the current page after automation stopped before the cart page.",
+      "diff": "Automated cart capture from Jun 2026 W1. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
+    },
+    {
+      "id": "auto-2026-06-05-tractor-supply-checkout",
+      "retailerId": "tractor-supply",
+      "surface": "checkout",
+      "device": "desktop",
+      "period": "Jun 2026 W1",
+      "at": "2026-06-05T21:09:02.283Z",
+      "src": "2026-06-05/tractor-supply-checkout.png",
+      "notes": "Fallback capture from the current page after automation stopped before checkout.",
       "diff": "Automated checkout capture from Jun 2026 W1. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
     },
     {
@@ -80,7 +102,7 @@
       "surface": "cart",
       "device": "desktop",
       "period": "Jun 2026 W1",
-      "at": "2026-06-05T20:53:36.178Z",
+      "at": "2026-06-05T21:09:02.283Z",
       "src": "2026-06-05/walmart-cart.png",
       "notes": "Captured automatically from the cart page after attempting two-item setup.",
       "diff": "Automated cart capture from Jun 2026 W1. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
@@ -91,7 +113,7 @@
       "surface": "checkout",
       "device": "desktop",
       "period": "Jun 2026 W1",
-      "at": "2026-06-05T20:53:36.178Z",
+      "at": "2026-06-05T21:09:02.283Z",
       "src": "2026-06-05/walmart-checkout.png",
       "notes": "Captured automatically from the first checkout or checkout-entry page.",
       "diff": "Automated checkout capture from Jun 2026 W1. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."

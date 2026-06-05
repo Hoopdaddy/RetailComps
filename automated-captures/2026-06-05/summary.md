@@ -1,6 +1,6 @@
 # Weekly Checkout Monitor
 
-Run: 2026-06-05T20:53:36.178Z
+Run: 2026-06-05T21:09:02.283Z
 Period: Jun 2026 W1
 
 ## Results
@@ -12,7 +12,7 @@ Period: Jun 2026 W1
   - Checkout button was not found; checkout screenshot captures the current cart state.
   - Files: chewy-cart.png, chewy-checkout.png
 - [partial] Target
-  - pickup: no add-to-cart control was found; screenshots may show an incomplete cart.
+  - pickup: add-to-cart control clicked.
   - shipping: no add-to-cart control was found; screenshots may show an incomplete cart.
   - Checkout button was not found; checkout screenshot captures the current cart state.
   - Files: target-cart.png, target-checkout.png
@@ -20,7 +20,7 @@ Period: Jun 2026 W1
   - pickup: no add-to-cart control was found; screenshots may show an incomplete cart.
   - shipping: no add-to-cart control was found; screenshots may show an incomplete cart.
   - Automation stopped early: page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.tractorsupply.com/tsc/cart Call log: - navigating to "https://www.tractorsupply.com/tsc/cart", waiting until "domcontentloaded"
-  - Files: tractor-supply-automation-state.png
+  - Files: tractor-supply-automation-state.png, tractor-supply-cart.png, tractor-supply-checkout.png
 - [partial] Walmart
   - pickup: no add-to-cart control was found; screenshots may show an incomplete cart.
   - shipping: no add-to-cart control was found; screenshots may show an incomplete cart.
