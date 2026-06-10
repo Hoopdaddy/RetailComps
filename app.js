@@ -20,7 +20,8 @@ function bindCaptureControls() {
     renderCaptures();
   };
   $("#saveShot").onclick = () => $("#fileInput").click();
-  $("#dropZone").onclick = () => $("#fileInput").click();
+  $("#dropZone").onclick = () => $("#dropZone").focus();
+  $("#dropZone").onpaste = savePastedScreenshot;
   $("#dropZone").ondragover = (event) => {
     event.preventDefault();
     event.currentTarget.classList.add("dragging");
@@ -40,6 +41,33 @@ function bindCaptureControls() {
     saveCaptures();
     renderCaptures();
   });
+}
+
+function clipboardImageFile(event) {
+  const itemFile = Array.from(event.clipboardData?.items || [])
+    .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+    .map((item) => item.getAsFile())
+    .find(Boolean);
+  return itemFile || Array.from(event.clipboardData?.files || []).find((file) => file.type.startsWith("image/"));
+}
+
+function savePastedScreenshot(event) {
+  const file = clipboardImageFile(event);
+  if (!file) return false;
+  event.preventDefault();
+  event.stopPropagation();
+  addCapture(file);
+  return true;
+}
+
+function isTextEntry(element) {
+  return element?.matches?.("input, textarea, select, [contenteditable='true']");
+}
+
+function handleScreenshotPaste(event) {
+  if (state.view !== "captures" || !$("#dropZone")) return;
+  if (isTextEntry(document.activeElement)) return;
+  savePastedScreenshot(event);
 }
 
 function addCapture(file) {
@@ -149,6 +177,7 @@ $("#importFile").onchange = (event) => {
   if (event.target.files[0]) importData(event.target.files[0]);
   event.target.value = "";
 };
+document.addEventListener("paste", handleScreenshotPaste);
 setMissionJoke();
 render();
 
