@@ -78,6 +78,31 @@ function toast(message) {
   toast.timer = setTimeout(() => $("#toast").classList.remove("visible"), 3000);
 }
 
+const missionJokes = [
+  "A promo code walked into checkout. Everyone applied themselves.",
+  "The feature matrix asked for a raise. It said it had a lot of rows to manage.",
+  "Cart audits are easier when the cart does not squeak.",
+  "I told the SKU it was outstanding. It said it was just in stock.",
+  "Checkout optimization: fewer clicks, more high-fives.",
+  "The comparison report joined a band. It had great conversion rhythm.",
+  "Why did the cart page bring a notebook? It wanted to capture everything.",
+  "Retail math: two carts, no waiting, one happy PM.",
+  "The checkout flow started stretching. It wanted a better funnel.",
+  "A benchmark walked into a meeting and said, 'I brought receipts.'"
+];
+
+function setMissionJoke() {
+  const target = $("#missionJoke");
+  if (!target) return;
+  const lastIndex = Number(sessionStorage.getItem("tsc-mission-joke-index"));
+  let nextIndex = Math.floor(Math.random() * missionJokes.length);
+  if (missionJokes.length > 1 && nextIndex === lastIndex) {
+    nextIndex = (nextIndex + 1) % missionJokes.length;
+  }
+  sessionStorage.setItem("tsc-mission-joke-index", String(nextIndex));
+  target.textContent = missionJokes[nextIndex];
+}
+
 function exportData() {
   const payload = { exportedAt: new Date().toISOString(), matrix: state.matrix, observations: state.observations, captures: state.captures.filter((capture) => !capture.seed && !capture.automated) };
   const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
@@ -124,6 +149,7 @@ $("#importFile").onchange = (event) => {
   if (event.target.files[0]) importData(event.target.files[0]);
   event.target.value = "";
 };
+setMissionJoke();
 render();
 
 if (typeof loadAutomatedCaptures === "function") {
