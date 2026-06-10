@@ -5,6 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hoop's Cart and Checkout PM Workbench</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+      .topbar-title {
+        min-width: 0;
+      }
+
+      .mission-moment {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 0.84rem;
+        line-height: 1.35;
+      }
+
+      .mission-moment strong {
+        flex: 0 0 auto;
+        border: 1px solid #f1c9cf;
+        border-radius: 999px;
+        background: #fff3f5;
+        color: var(--tsc-red);
+        padding: 4px 8px;
+        font-size: 0.72rem;
+        font-weight: 900;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      .mission-moment span {
+        min-width: 0;
+      }
+
+      @media (max-width: 760px) {
+        .mission-moment {
+          align-items: stretch;
+          flex-direction: column;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="app-shell">
@@ -35,9 +74,13 @@
 
       <main class="main-panel">
         <header class="topbar">
-          <div>
+          <div class="topbar-title">
             <p class="eyebrow">Cart and checkout competitive monitoring</p>
             <h2 id="pageHeading">PM command center</h2>
+            <div class="mission-moment" aria-live="polite">
+              <strong>Have fun</strong>
+              <span id="missionJoke">Retail comparison mode: engaged.</span>
+            </div>
           </div>
           <div class="topbar-actions">
             <label class="secondary-action" id="importButton" for="importFile" style="cursor:pointer">Import</label>
