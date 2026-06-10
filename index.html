@@ -37,6 +37,14 @@
         min-width: 0;
       }
 
+      .drop-zone:focus,
+      .drop-zone:focus-visible {
+        outline: 0;
+        border-color: var(--blue);
+        background: #edf5ff;
+        box-shadow: 0 0 0 3px rgba(35, 103, 201, 0.14);
+      }
+
       @media (max-width: 760px) {
         .mission-moment {
           align-items: stretch;
