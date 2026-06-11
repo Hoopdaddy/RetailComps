@@ -38,6 +38,23 @@ const storage = {
   observations: "tsc-pm-feature-observations-v1"
 };
 
+function periodForDate(date = new Date()) {
+  const month = date.toLocaleString("en", { month: "long" });
+  const year = date.getFullYear();
+  const firstDayOffset = new Date(year, date.getMonth(), 1).getDay();
+  const week = Math.ceil((date.getDate() + firstDayOffset) / 7);
+  return `${month} ${year} W${week}`;
+}
+
+function periodRank(period) {
+  const match = /^([A-Za-z]+)\s+(\d{4})\s+W(\d+)$/i.exec(period || "");
+  if (!match) return -1;
+  const month = new Date(`${match[1]} 1, ${match[2]}`).getMonth();
+  return Number(match[2]) * 100 + month * 10 + Number(match[3]);
+}
+
+const currentPeriod = periodForDate();
+
 const seedMatrix = {
   "tractor-supply": ["yes", "partial", "yes", "no", "partial", "yes", "partial", "partial", "yes", "partial", "partial", "yes", "partial", "yes", "yes", "partial", "partial"],
   chewy: ["yes", "yes", "yes", "yes", "yes", "yes", "no", "partial", "partial", "yes", "yes", "yes", "partial", "yes", "yes", "no", "partial"],
@@ -54,9 +71,9 @@ let state = {
   retailerId: "tractor-supply",
   surface: "cart",
   device: "desktop",
-  from: "May 2026 W4",
-  to: "May 2026 W5",
-  uploadPeriod: "May 2026 W5",
+  from: "May 2026 W5",
+  to: currentPeriod,
+  uploadPeriod: currentPeriod,
   matrixFilter: "all",
   matrixSearch: "",
   featureId: "cartFulfillment",
@@ -109,6 +126,16 @@ function savePrefs() {
     featureId: state.featureId,
     featureStatus: state.featureStatus
   });
+}
+
+function syncCurrentPeriod() {
+  const currentRank = periodRank(currentPeriod);
+  const uploadRank = periodRank(state.uploadPeriod);
+  if (state.uploadPeriod === currentPeriod || uploadRank >= currentRank) return;
+  state.from = state.to || state.uploadPeriod;
+  state.to = currentPeriod;
+  state.uploadPeriod = currentPeriod;
+  savePrefs();
 }
 
 function featureById(featureId) {
@@ -218,11 +245,11 @@ const seedCaptures = [
 }));
 
 function loadCaptures() {
-  state.captures = byDate([...seedCaptures, ...read(storage.captures, [])]);
+  state.captures = byDate([...seedCaptures, ...read(storage.captures, []).filter((capture) => !capture.seed && !capture.library && capture.storage !== "github" && !capture.automated)]);
 }
 
 function saveCaptures() {
-  write(storage.captures, state.captures.filter((capture) => !capture.seed));
+  write(storage.captures, state.captures.filter((capture) => !capture.seed && !capture.library && capture.storage !== "github" && !capture.automated));
 }
 
 function latest(filters) {
@@ -230,7 +257,9 @@ function latest(filters) {
 }
 
 function periods() {
-  return [...new Set(["May 2026 W4", "May 2026 W5", state.from, state.to, state.uploadPeriod, ...state.captures.map((capture) => capture.period)])].filter(Boolean).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  return [...new Set(["May 2026 W4", "May 2026 W5", currentPeriod, state.from, state.to, state.uploadPeriod, ...state.captures.map((capture) => capture.period)])]
+    .filter(Boolean)
+    .sort((a, b) => periodRank(a) - periodRank(b));
 }
 
 function missing(id) {
