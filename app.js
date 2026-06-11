@@ -70,9 +70,40 @@ function handleScreenshotPaste(event) {
   savePastedScreenshot(event);
 }
 
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+function optimizeScreenshotDataUrl(file) {
+  return readFileAsDataUrl(file).then((source) => new Promise((resolve) => {
+    const image = new Image();
+    image.onload = () => {
+      const maxEdge = 1600;
+      const scale = Math.min(1, maxEdge / image.width, maxEdge / image.height);
+      if (source.length < 900000 && scale === 1) {
+        resolve(source);
+        return;
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.width * scale));
+      canvas.height = Math.max(1, Math.round(image.height * scale));
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", 0.82));
+    };
+    image.onerror = () => resolve(source);
+    image.src = source;
+  }));
+}
+
 function addCapture(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
+  optimizeScreenshotDataUrl(file).then((src) => {
     const surface = $("#uploadSurface").value;
     const device = $("#uploadDevice").value;
     const period = $("#uploadPeriod").value.trim() || "Unlabeled period";
@@ -84,19 +115,24 @@ function addCapture(file) {
       device,
       period,
       at: new Date().toISOString(),
-      src: reader.result,
+      src,
       notes: $("#notes").value.trim(),
       diff: previous ? `New ${surfaceName(surface).toLowerCase()} screenshot saved against ${previous.period}. Review fulfillment, promotions, subscriptions, payments, and friction.` : "First saved screenshot for this screen."
     };
     state.captures = byDate([capture, ...state.captures]);
     state.uploadPeriod = period;
     state.to = period;
-    saveCaptures();
-    savePrefs();
+    try {
+      saveCaptures();
+      savePrefs();
+    } catch {
+      state.captures = state.captures.filter((item) => item.id !== capture.id);
+      toast("Screenshot could not be saved. Browser storage may be full, so remove older screenshots or use a smaller snip.");
+      return;
+    }
     renderCaptures();
     toast(`${surfaceName(surface)} screenshot saved.`);
-  };
-  reader.readAsDataURL(file);
+  }).catch(() => toast("That screenshot could not be read from the clipboard."));
 }
 
 function toast(message) {
@@ -104,6 +140,32 @@ function toast(message) {
   $("#toast").classList.add("visible");
   clearTimeout(toast.timer);
   toast.timer = setTimeout(() => $("#toast").classList.remove("visible"), 3000);
+}
+
+function runtimePeriodForDate(date = new Date()) {
+  const month = date.toLocaleString("en", { month: "long" });
+  const year = date.getFullYear();
+  const firstDayOffset = new Date(year, date.getMonth(), 1).getDay();
+  const week = Math.ceil((date.getDate() + firstDayOffset) / 7);
+  return `${month} ${year} W${week}`;
+}
+
+function runtimePeriodRank(period) {
+  const match = /^([A-Za-z]+)\s+(\d{4})\s+W(\d+)$/i.exec(period || "");
+  if (!match) return -1;
+  const month = new Date(`${match[1]} 1, ${match[2]}`).getMonth();
+  return Number(match[2]) * 100 + month * 10 + Number(match[3]);
+}
+
+function syncRuntimeCurrentPeriod() {
+  const current = runtimePeriodForDate();
+  const currentRank = runtimePeriodRank(current);
+  const uploadRank = runtimePeriodRank(state.uploadPeriod);
+  if (state.uploadPeriod === current || uploadRank >= currentRank) return;
+  state.from = state.to || state.uploadPeriod;
+  state.to = current;
+  state.uploadPeriod = current;
+  savePrefs();
 }
 
 const missionJokes = [
@@ -169,11 +231,13 @@ function render() {
 }
 
 Object.assign(state, read(storage.prefs, {}));
+syncRuntimeCurrentPeriod();
 loadCaptures();
 bindViewButtons();
 $("#resetOrderButton").onclick = () => toast("Retailer order is already reset.");
-$("#exportButton").onclick = exportData;
-$("#importFile").onchange = (event) => {
+if ($("#exportButton")) $("#exportButton").onclick = exportData;
+if ($("#importButton")) $("#importButton").onclick = () => $("#importFile").click();
+if ($("#importFile")) $("#importFile").onchange = (event) => {
   if (event.target.files[0]) importData(event.target.files[0]);
   event.target.value = "";
 };
