@@ -102,8 +102,68 @@ function optimizeScreenshotDataUrl(file) {
   }));
 }
 
+function normalizeLibraryCapture(capture, source = "api") {
+  const path = capture.path || "";
+  const src = capture.src || (path ? (source === "api" ? `/api/screenshots?image=${encodeURIComponent(path)}` : `/${path}`) : "");
+  return { ...capture, src, library: true, storage: capture.storage || "github" };
+}
+
+function mergeLibraryCaptures(captures, source = "api") {
+  const byId = new Map(state.captures.map((capture) => [capture.id, capture]));
+  captures.map((capture) => normalizeLibraryCapture(capture, source)).forEach((capture) => byId.set(capture.id, capture));
+  state.captures = byDate([...byId.values()]);
+}
+
+async function readJsonResponse(response) {
+  const type = response.headers.get("content-type") || "";
+  if (!type.includes("application/json")) throw new Error("Expected JSON response");
+  return response.json();
+}
+
+async function loadStaticScreenshotLibrary() {
+  const response = await fetch(`/data/screenshot-library.json?ts=${Date.now()}`, { cache: "no-store" });
+  if (!response.ok) return 0;
+  const payload = await readJsonResponse(response);
+  const captures = Array.isArray(payload.captures) ? payload.captures : [];
+  mergeLibraryCaptures(captures, "static");
+  return captures.length;
+}
+
+async function loadScreenshotLibrary() {
+  try {
+    const response = await fetch(`/api/screenshots?ts=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) throw new Error("Screenshot API unavailable");
+    const payload = await readJsonResponse(response);
+    const captures = Array.isArray(payload.captures) ? payload.captures : [];
+    mergeLibraryCaptures(captures, "api");
+    return captures.length;
+  } catch {
+    try {
+      return await loadStaticScreenshotLibrary();
+    } catch {
+      return 0;
+    }
+  }
+}
+
+async function saveCaptureToLibrary(capture, imageDataUrl) {
+  const response = await fetch("/api/screenshots", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ capture, imageDataUrl })
+  });
+  if (!response.ok) throw new Error("Screenshot library save failed");
+  const payload = await readJsonResponse(response);
+  if (!payload.capture) throw new Error("Screenshot library save did not return a capture");
+  return normalizeLibraryCapture(payload.capture, "api");
+}
+
+function saveCaptureToBrowser(capture, src) {
+  return { ...capture, src, storage: "browser", library: false };
+}
+
 function addCapture(file) {
-  optimizeScreenshotDataUrl(file).then((src) => {
+  optimizeScreenshotDataUrl(file).then(async (src) => {
     const surface = $("#uploadSurface").value;
     const device = $("#uploadDevice").value;
     const period = $("#uploadPeriod").value.trim() || "Unlabeled period";
@@ -115,23 +175,39 @@ function addCapture(file) {
       device,
       period,
       at: new Date().toISOString(),
-      src,
       notes: $("#notes").value.trim(),
       diff: previous ? `New ${surfaceName(surface).toLowerCase()} screenshot saved against ${previous.period}. Review fulfillment, promotions, subscriptions, payments, and friction.` : "First saved screenshot for this screen."
     };
-    state.captures = byDate([capture, ...state.captures]);
+    let savedCapture;
+    try {
+      savedCapture = await saveCaptureToLibrary(capture, src);
+    } catch {
+      savedCapture = saveCaptureToBrowser(capture, src);
+    }
+
+    state.captures = byDate([savedCapture, ...state.captures.filter((item) => item.id !== savedCapture.id)]);
     state.uploadPeriod = period;
     state.to = period;
-    try {
-      saveCaptures();
-      savePrefs();
-    } catch {
-      state.captures = state.captures.filter((item) => item.id !== capture.id);
-      toast("Screenshot could not be saved. Browser storage may be full, so remove older screenshots or use a smaller snip.");
-      return;
+
+    if (savedCapture.storage === "github") {
+      try {
+        savePrefs();
+      } catch {
+        // The screenshot is already in the shared library; preferences can catch up later.
+      }
+    } else {
+      try {
+        saveCaptures();
+        savePrefs();
+      } catch {
+        state.captures = state.captures.filter((item) => item.id !== savedCapture.id);
+        toast("Screenshot could not be saved. Browser storage may be full, so remove older browser-only screenshots.");
+        return;
+      }
     }
+
     renderCaptures();
-    toast(`${surfaceName(surface)} screenshot saved.`);
+    toast(savedCapture.storage === "github" ? `${surfaceName(surface)} screenshot saved to the library.` : `${surfaceName(surface)} screenshot saved in this browser.`);
   }).catch(() => toast("That screenshot could not be read from the clipboard."));
 }
 
@@ -248,6 +324,10 @@ if ($("#importFile")) $("#importFile").onchange = (event) => {
 document.addEventListener("paste", handleScreenshotPaste);
 setMissionJoke();
 render();
+
+loadScreenshotLibrary().then((count) => {
+  if (count) render();
+});
 
 if (typeof loadAutomatedCaptures === "function") {
   loadAutomatedCaptures().then((count) => {
