@@ -165,7 +165,11 @@ function syncRuntimeCurrentPeriod() {
   state.from = state.to || state.uploadPeriod;
   state.to = current;
   state.uploadPeriod = current;
-  savePrefs();
+  try {
+    savePrefs();
+  } catch {
+    // A full localStorage should not prevent the workbench from opening.
+  }
 }
 
 const missionJokes = [
