@@ -1,5 +1,18 @@
 {
   "version": 1,
-  "updatedAt": null,
-  "captures": []
+  "updatedAt": "2026-06-11T14:50:00.000Z",
+  "captures": [
+    {
+      "id": "validation-test-cart-desktop-20260611-stdin",
+      "retailerId": "validation-test",
+      "surface": "cart",
+      "device": "desktop",
+      "period": "June 2026 W2",
+      "at": "2026-06-11T14:50:00.000Z",
+      "notes": "Temporary validation capture",
+      "diff": "Validation test for screenshot library write access.",
+      "path": "screenshots/validation-test/cart/desktop/june-2026-w2-20260611145000.png",
+      "storage": "github"
+    }
+  ]
 }
