@@ -19,7 +19,7 @@ for (const file of files) {
   fs.copyFileSync(path.join(root, file), path.join(output, file));
 }
 
-const directories = ["assets", "automated-captures"];
+const directories = ["assets", "automated-captures", "data", "screenshots"];
 for (const directory of directories) {
   const source = path.join(root, directory);
   if (fs.existsSync(source)) {
