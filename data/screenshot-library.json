@@ -1,5 +1,18 @@
 {
   "version": 1,
-  "updatedAt": null,
-  "captures": []
+  "updatedAt": "2026-07-27T14:49:15.927Z",
+  "captures": [
+    {
+      "id": "chewy-cart-desktop-1785163755927",
+      "retailerId": "chewy",
+      "surface": "cart",
+      "device": "desktop",
+      "period": "July 2026 W5",
+      "at": "2026-07-27T14:49:15.927Z",
+      "notes": "",
+      "diff": "New cart screenshot saved against Jul 2026 W3. Review fulfillment, promotions, subscriptions, payments, and friction.",
+      "path": "screenshots/chewy/cart/desktop/july-2026-w5-20260727144915.jpg",
+      "storage": "github"
+    }
+  ]
 }
