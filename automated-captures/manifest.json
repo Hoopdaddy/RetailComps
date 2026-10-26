@@ -1,6 +1,34 @@
 {
   "runs": [
     {
+      "id": "2026-10-26",
+      "at": "2026-10-26T18:57:22.217Z",
+      "period": "Oct 2026 W4",
+      "summary": "2026-10-26/summary.md",
+      "results": [
+        {
+          "id": "chewy",
+          "name": "Chewy",
+          "status": "partial"
+        },
+        {
+          "id": "target",
+          "name": "Target",
+          "status": "partial"
+        },
+        {
+          "id": "tractor-supply",
+          "name": "Tractor Supply",
+          "status": "partial"
+        },
+        {
+          "id": "walmart",
+          "name": "Walmart",
+          "status": "partial"
+        }
+      ]
+    },
+    {
       "id": "2026-10-19",
       "at": "2026-10-19T18:55:01.072Z",
       "period": "Oct 2026 W3",
@@ -562,6 +590,94 @@
     }
   ],
   "captures": [
+    {
+      "id": "auto-2026-10-26-chewy-cart",
+      "retailerId": "chewy",
+      "surface": "cart",
+      "device": "desktop",
+      "period": "Oct 2026 W4",
+      "at": "2026-10-26T18:57:22.217Z",
+      "src": "2026-10-26/chewy-cart.png",
+      "notes": "Captured automatically from the cart page after attempting two-item setup.",
+      "diff": "Automated cart capture from Oct 2026 W4. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
+    },
+    {
+      "id": "auto-2026-10-26-chewy-checkout",
+      "retailerId": "chewy",
+      "surface": "checkout",
+      "device": "desktop",
+      "period": "Oct 2026 W4",
+      "at": "2026-10-26T18:57:22.217Z",
+      "src": "2026-10-26/chewy-checkout.png",
+      "notes": "Captured automatically from the first checkout or checkout-entry page.",
+      "diff": "Automated checkout capture from Oct 2026 W4. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
+    },
+    {
+      "id": "auto-2026-10-26-target-cart",
+      "retailerId": "target",
+      "surface": "cart",
+      "device": "desktop",
+      "period": "Oct 2026 W4",
+      "at": "2026-10-26T18:57:22.217Z",
+      "src": "2026-10-26/target-cart.png",
+      "notes": "Captured automatically from the cart page after attempting two-item setup.",
+      "diff": "Automated cart capture from Oct 2026 W4. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
+    },
+    {
+      "id": "auto-2026-10-26-target-checkout",
+      "retailerId": "target",
+      "surface": "checkout",
+      "device": "desktop",
+      "period": "Oct 2026 W4",
+      "at": "2026-10-26T18:57:22.217Z",
+      "src": "2026-10-26/target-checkout.png",
+      "notes": "Captured automatically from the first checkout or checkout-entry page.",
+      "diff": "Automated checkout capture from Oct 2026 W4. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
+    },
+    {
+      "id": "auto-2026-10-26-tractor-supply-cart",
+      "retailerId": "tractor-supply",
+      "surface": "cart",
+      "device": "desktop",
+      "period": "Oct 2026 W4",
+      "at": "2026-10-26T18:57:22.217Z",
+      "src": "2026-10-26/tractor-supply-cart.png",
+      "notes": "Fallback capture from the current page after automation stopped before the cart page.",
+      "diff": "Automated cart capture from Oct 2026 W4. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
+    },
+    {
+      "id": "auto-2026-10-26-tractor-supply-checkout",
+      "retailerId": "tractor-supply",
+      "surface": "checkout",
+      "device": "desktop",
+      "period": "Oct 2026 W4",
+      "at": "2026-10-26T18:57:22.217Z",
+      "src": "2026-10-26/tractor-supply-checkout.png",
+      "notes": "Fallback capture from the current page after automation stopped before checkout.",
+      "diff": "Automated checkout capture from Oct 2026 W4. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
+    },
+    {
+      "id": "auto-2026-10-26-walmart-cart",
+      "retailerId": "walmart",
+      "surface": "cart",
+      "device": "desktop",
+      "period": "Oct 2026 W4",
+      "at": "2026-10-26T18:57:22.217Z",
+      "src": "2026-10-26/walmart-cart.png",
+      "notes": "Captured automatically from the cart page after attempting two-item setup.",
+      "diff": "Automated cart capture from Oct 2026 W4. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
+    },
+    {
+      "id": "auto-2026-10-26-walmart-checkout",
+      "retailerId": "walmart",
+      "surface": "checkout",
+      "device": "desktop",
+      "period": "Oct 2026 W4",
+      "at": "2026-10-26T18:57:22.217Z",
+      "src": "2026-10-26/walmart-checkout.png",
+      "notes": "Captured automatically from the first checkout or checkout-entry page.",
+      "diff": "Automated checkout capture from Oct 2026 W4. Review fulfillment, promotions, subscriptions, payment options, and checkout friction."
+    },
     {
       "id": "auto-2026-10-19-chewy-cart",
       "retailerId": "chewy",
